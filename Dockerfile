@@ -26,5 +26,6 @@ RUN  set -x \
 USER me:me
 WORKDIR /home/me
 
-ENTRYPOINT [ "fixuid", "-q" ]
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+ENTRYPOINT [ "docker-entrypoint.sh" ]
 CMD [ "ash" ]
