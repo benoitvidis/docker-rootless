@@ -1,8 +1,8 @@
-FROM alpine:3.12
+FROM alpine:3.14
 
 LABEL fr.ben0.maintainer="Benoît Vidis"
 
-ARG FIXUID_VERSION=0.5
+ARG FIXUID_VERSION=0.5.1
 
 RUN  set -x \
   \
