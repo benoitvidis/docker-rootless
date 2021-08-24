@@ -1,4 +1,4 @@
-FROM alpine:3.14
+FROM ubuntu:focal
 
 LABEL fr.ben0.maintainer="Benoît Vidis"
 
@@ -6,13 +6,14 @@ ARG FIXUID_VERSION=0.5.1
 
 RUN  set -x \
   \
-  && apk add --no-cache --virtual deps \
+  && apt-get update \
+  && apt-get install --no-install-recommends --no-install-suggests -y \
+    ca-certificates \
     curl \
-  && apk add --no-cache \
     sudo \
   \
-  && addgroup -g 1000 me \
-  && adduser -u 1000 -G me -h /home/me -s /bin/sh -D me \
+  && addgroup --gid 1000 me \
+  && adduser --uid 1000 --ingroup me --home /home/me --shell /bin/sh --disabled-password --gecos "" me \
   && echo "me ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers \
   \
   && curl -SsL https://github.com/boxboat/fixuid/releases/download/v${FIXUID_VERSION}/fixuid-${FIXUID_VERSION}-linux-amd64.tar.gz | tar -C /usr/local/bin -xzf - \
@@ -21,11 +22,13 @@ RUN  set -x \
   && mkdir -p /etc/fixuid \
   && printf "user: me\ngroup: me\n" > /etc/fixuid/config.yml \
   \
-  && apk del deps
+  && apt-get purge -y \
+    curl \
+  && rm -rf /var/lib/apt/lists/*
 
 USER me:me
 WORKDIR /home/me
 
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 ENTRYPOINT [ "docker-entrypoint.sh" ]
-CMD [ "ash" ]
+CMD [ "bash" ]
